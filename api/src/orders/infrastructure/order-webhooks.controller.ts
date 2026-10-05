@@ -13,6 +13,20 @@ import { OrderWebhookMapperRegistry } from './webhooks/order-webhook-mapper.regi
 import { EcommerceOrderWebhookMapper } from './webhooks/platforms/ecommerce/ecommerce-order-webhook.mapper';
 import { EcommerceOrderWebhookPayload } from './webhooks/platforms/ecommerce/ecommerce-order-webhook.payload';
 
+const ecommercePayloadExample = {
+  id: 'ORD-98432',
+  buyer: {
+    buyerName: 'Maria Souza',
+    buyerEmail: 'maria@email.com',
+  },
+  lineItems: [
+    { itemId: 'P-001', itemName: 'Camiseta Básica', qty: 2, unitPrice: 49.9 },
+    { itemId: 'P-002', itemName: 'Calça Jeans', qty: 1, unitPrice: 129.9 },
+  ],
+  totalAmount: 229.7,
+  createdAt: '2025-02-10T14:32:00Z',
+};
+
 @ApiTags('webhooks')
 @Controller('webhooks/orders')
 export class OrderWebhooksController {
@@ -24,7 +38,10 @@ export class OrderWebhooksController {
   @Inject(CreateOrderUseCase.UseCase)
   private createOrderUseCase: CreateOrderUseCase.UseCase;
 
-  @ApiBody({ type: EcommerceOrderWebhookPayload })
+  @ApiBody({
+    type: EcommerceOrderWebhookPayload,
+    examples: { enunciado: { value: ecommercePayloadExample } },
+  })
   @ApiResponse({
     status: 200,
     description:
@@ -43,6 +60,7 @@ export class OrderWebhooksController {
   @ApiBody({
     type: EcommerceOrderWebhookPayload,
     description: 'O formato do corpo depende da plataforma informada',
+    examples: { ecommerce: { value: ecommercePayloadExample } },
   })
   @ApiResponse({
     status: 200,
