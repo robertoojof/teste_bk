@@ -1,0 +1,74 @@
+# Requisições de exemplo (extensão REST Client do VS Code).
+# Valores monetários em centavos. Com `yarn start:dev` a API já sobe com dados
+# de demonstração (seed).
+
+@baseUrl = http://localhost:3000
+
+### Dashboard dos últimos 30 dias (dados do seed)
+GET {{baseUrl}}/dashboard?startDate={{$datetime "YYYY-MM-DD" -29 d}}&endDate={{$datetime "YYYY-MM-DD"}}
+
+### Dashboard de fevereiro/2025 (pedido do webhook do enunciado)
+GET {{baseUrl}}/dashboard?startDate=2025-02-01&endDate=2025-02-28
+
+### Listar produtos
+GET {{baseUrl}}/products?page=1&perPage=10&sort=name&sortDir=asc
+
+### Cadastrar produto
+# @name createProduct
+POST {{baseUrl}}/products
+Content-Type: application/json
+
+{
+  "name": "Meia Esportiva",
+  "sku": "P-006",
+  "price": 2490
+}
+
+### Buscar produto
+GET {{baseUrl}}/products/{{createProduct.response.body.data.id}}
+
+### Listar produtos com custo
+GET {{baseUrl}}/product-costs
+
+### Cadastrar / editar custo do produto
+PUT {{baseUrl}}/product-costs/{{createProduct.response.body.data.id}}
+Content-Type: application/json
+
+{
+  "unitCost": 900
+}
+
+### Webhook de pedido (payload do teste)
+# @name webhook
+POST {{baseUrl}}/webhooks/orders/ecommerce
+Content-Type: application/json
+
+{
+  "id": "ORD-98432",
+  "buyer": {
+    "buyerName": "Maria Souza",
+    "buyerEmail": "maria@email.com"
+  },
+  "lineItems": [
+    {
+      "itemId": "P-001",
+      "itemName": "Camiseta Básica",
+      "qty": 2,
+      "unitPrice": 49.90
+    },
+    {
+      "itemId": "P-002",
+      "itemName": "Calça Jeans",
+      "qty": 1,
+      "unitPrice": 129.90
+    }
+  ],
+  "totalAmount": 229.70,
+  "createdAt": "2025-02-10T14:32:00Z"
+}
+
+### Listar pedidos (mais recentes primeiro)
+GET {{baseUrl}}/orders?page=1&perPage=5
+
+### Detalhe do pedido
+GET {{baseUrl}}/orders/{{webhook.response.body.data.id}}
